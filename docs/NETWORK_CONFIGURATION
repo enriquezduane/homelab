@@ -1,4 +1,5 @@
 Component       StaticIP                     Purpose/Notes
+
 DefaultGateway  192.168.1.1                  Home Router
 DHCPRange       192.168.1.2-192.168.1.199    For general devices
 ProxmoxHost     192.168.1.200                Static IP for Proxmox Host
