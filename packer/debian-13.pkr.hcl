@@ -181,7 +181,9 @@ build {
   # machine-id, cloud-init state) so every clone starts fresh.
   # Reset /etc/network/interfaces to loopback only: the installer left a DHCP
   # rule there that would fight Cloud-Init's static IP on clones.
+  # Drop the installer's CD-ROM line from /etc/fstab (clones have no such drive).
   # Finally lock the temporary `packer` account and remove its sudo rule.
+  # (The locked `packer` user itself is removed later by Ansible, Milestone 4.)
   provisioner "shell" {
     inline = [
       "sudo apt-get update",
@@ -192,6 +194,7 @@ build {
       "sudo truncate -s 0 /etc/machine-id",
       "sudo rm -f /var/lib/dbus/machine-id",
       "printf 'auto lo\\niface lo inet loopback\\n\\nsource /etc/network/interfaces.d/*\\n' | sudo tee /etc/network/interfaces > /dev/null",
+      "sudo sed -i '\\|/media/cdrom|d' /etc/fstab",
       "sudo cloud-init clean --logs",
       "sudo sh -c 'passwd -l packer && rm -f /etc/sudoers.d/packer'"
     ]
