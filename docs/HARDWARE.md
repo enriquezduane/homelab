@@ -22,6 +22,8 @@
         - Size: ~364.8 GB (~362 GB available)
         - Content: Virtual machine raw block images (`rootdir,images`)
         - Virtual disk policy: 20GB thin-provisioned root disk standard per VM
+- VM Templates (VMID reservations):
+    - `9000`: Debian 13 golden template (`just packer-build`, `packer/debian-13.pkr.hcl`)
 - Networking: 1x Gigabit Ethernet (1GbE RJ45)
     - Host interface: Bound to Linux bridge `vmbr0`
     - Speed: 1000 Mbps full-duplex

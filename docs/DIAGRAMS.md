@@ -36,7 +36,7 @@ vars: {
 ## Canonical Baseline Diagrams
 - `network-topology.d2`: Gateway -> Host NIC -> `vmbr0` -> VMs.
 - `storage-layout.d2`: SSD -> `local` (ISOs/templates) vs `local-lvm` (VM disks) -> VMs.
-- `vm-flow.d2`: Debian Cloud Image -> Template 9000 -> Cloned VM (`just deploy`).
+- `vm-flow.d2`: Debian 13 ISO -> Packer -> Template 9000 -> Cloned VM (`tofu apply`).
 - New diagrams: Permitted for specific features (e.g., DNS flow, backup jobs) provided they respect the 4-8 node budget.
 
 ## Syntax & Connection Rules
