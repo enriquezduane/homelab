@@ -151,6 +151,8 @@ source "proxmox-iso" "debian-13" {
   ### 13. Installer Boot Command
   # Typed into the Debian boot menu: points the installer at the preseed
   # file and sends console output to the serial port.
+  # hostname/domain are set here, not in preseed.cfg: the installer configures
+  # networking before it can download the preseed file.
   boot_wait = "8s"
   boot_command = [
     "<esc><wait>",
