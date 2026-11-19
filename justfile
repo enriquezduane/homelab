@@ -1,35 +1,35 @@
-set shell := ["bash", "-cu"]
+set shell := ["bash", "-euo", "pipefail", "-c"]
 
-PVE_HOST := "proxmox-lab"
+host := "proxmox-lab"
 
-# Check Proxmox host connectivity and service health
-check host=PVE_HOST:
-    ./scripts/health_check.sh {{host}}
+# List available recipes
+default:
+    @just --list --unsorted
 
-# Run safe maintenance upgrades on Proxmox host. Reboot policy: auto (default), yes, no.
-upgrade reboot="auto":
-    ssh {{PVE_HOST}} 'bash -s' -- "{{reboot}}" < scripts/upgrade.sh
+# Check Proxmox host reachability and service health
+check target=host:
+    ./scripts/health_check.sh {{target}}
 
-# List all virtual machines on Proxmox host
+# List VMs on the Proxmox host
 list:
-    ssh {{PVE_HOST}} qm list
+    ssh {{host}} qm list
 
-# Milestone 1: Build Debian 13 template (VMID 9000) with Packer. Reads Proxmox API creds from root .env.
+# Upgrade Proxmox host packages (reboot: auto | yes | no)
+upgrade reboot="auto":
+    ssh {{host}} 'bash -s' -- "{{reboot}}" < scripts/upgrade.sh
+
+# Build Debian 13 template (VMID 9000) with Packer, using API creds from .env
 packer-build:
     source .env && cd packer && packer init . && packer build .
 
-# Milestone 2: Preview VM changes with OpenTofu (placeholder)
-tofu-plan:
-    @echo "Not set up yet: OpenTofu config arrives in Milestone 2." >&2; exit 1
+# Preview VM changes with OpenTofu (Milestone 2)
+tofu-plan: (_todo "OpenTofu" "2")
 
-# Milestone 2: Create/update VMs with OpenTofu (placeholder)
-tofu-apply:
-    @echo "Not set up yet: OpenTofu config arrives in Milestone 2." >&2; exit 1
+# Create/update VMs with OpenTofu (Milestone 2)
+tofu-apply: (_todo "OpenTofu" "2")
 
-# Milestone 4: Update and harden VMs with Ansible (placeholder)
-ansible:
-    @echo "Not set up yet: Ansible playbook arrives in Milestone 4." >&2; exit 1
+# Configure and harden VMs with Ansible (Milestone 4)
+ansible: (_todo "Ansible" "4")
 
-# Compile D2 diagram to SVG (e.g. just diagram network-topology)
-diagram name:
-    d2 --layout=elk --theme=8 --sketch --center --pad 20 docs/diagrams/{{name}}.d2 docs/diagrams/{{name}}.svg
+_todo tool milestone:
+    @echo "Not set up yet: {{tool}} arrives in Milestone {{milestone}}." >&2; exit 1

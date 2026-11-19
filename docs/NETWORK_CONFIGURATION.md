@@ -8,15 +8,18 @@
     - Primary nameserver: `1.1.1.1` (Cloudflare public resolver)
     - Fallback nameserver: `192.168.1.1` (Router upstream resolver)
 - Bridge Topology:
-    - Hypervisor bridge: `vmbr0`
-    - Physical uplink: Primary 1GbE Ethernet NIC
-    - Encapsulation: Untagged standard frames (single flat network, no VLANs)
+    - `vmbr0`: Main LAN bridge (host IP `192.168.1.200/24`)
+        - Physical uplink: `enp1s0` (primary 1GbE NIC)
+        - Encapsulation: Untagged standard frames (single flat network, no VLANs)
+    - `vmbr1`: "Isolated Lab Network" (no physical uplink, no host IP)
+        - VMs attached here can only reach each other; no LAN or internet access
 - IPv4 Address Allocation Layout:
     - `192.168.1.1`: Router and default gateway
     - `192.168.1.2`–`192.168.1.199`: Dynamic DHCP pool (general client devices)
     - `192.168.1.200`: Proxmox VE 9 Hypervisor Host (node `pve`, SSH alias `proxmox-lab`, Debian 13 base)
         - Web console: `https://192.168.1.200:8006`
-        - SSH management: `ssh root@192.168.1.200`
+        - SSH management: `ssh proxmox-lab` (root, key `~/.ssh/id_ed25519_proxmox_lab`)
+        - API access (Packer/OpenTofu): token `automation@pve!homelab` (PVEAdmin on `/`), credentials in repo-root `.env`
     - `192.168.1.201`–`192.168.1.254`: Static IP reservation pool for VMs
 
 ## Static IP Allocation Ledger

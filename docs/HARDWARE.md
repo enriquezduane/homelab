@@ -2,6 +2,7 @@
 
 - Model: Beelink EQ14 (Mini PC)
 - Hypervisor OS: Proxmox VE 9 (Debian 13 base)
+- Time zone: `Asia/Manila` on host and VM templates (hardware clock in UTC)
 - CPU: Intel Processor N150 (Twin Lake)
     - Architecture: 4 physical cores, 4 threads (Gracemont cores, no hyperthreading)
     - Clock: 0.8 GHz base up to 3.6 GHz boost
@@ -12,7 +13,8 @@
     - Configuration: 1x SO-DIMM (single-channel bus)
     - Host base overhead: ~1.5GB–2.0GB consumed by Proxmox VE 9 base
     - Guest VM budget: ~13.5GB maximum allocated memory across all active VMs
-- Storage: 500GB Internal SSD (~463GB active volume capacity)
+    - Host swap: 8GB (`pve/swap` LV)
+- Storage: 500GB Internal SSD (FORESEE 512GB SATA, `/dev/sda`; ~463GB active volume capacity)
     - Root filesystem: `local`
         - Type: Directory (`/var/lib/vz`)
         - Size: ~98.5 GB (~83 GB available)
@@ -24,10 +26,10 @@
         - Virtual disk policy: 20GB thin-provisioned root disk standard per VM
 - VM Templates (VMID reservations):
     - `9000`: Debian 13 golden template (`just packer-build`, `packer/debian-13.pkr.hcl`)
-- Networking: 1x Gigabit Ethernet (1GbE RJ45)
-    - Host interface: Bound to Linux bridge `vmbr0`
-    - Speed: 1000 Mbps full-duplex
-    - Secondary physical interface: Not connected / unused
+- Networking: 2x Gigabit Ethernet (1GbE RJ45) + Wi-Fi
+    - `enp1s0`: Primary NIC, bound to Linux bridge `vmbr0`, 1000 Mbps full-duplex
+    - `enp2s0`: Second 1GbE NIC, not connected / unused
+    - `wlo1`: Wi-Fi, unused
 - Out-of-band & Terminal:
     - Display: Headless operation
     - Virtual serial redirect: Required on all VM templates (`--serial0 socket --vga serial0`) for console access via `qm terminal <VMID>`

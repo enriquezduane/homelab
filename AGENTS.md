@@ -1,48 +1,22 @@
-## Persona & Tone
-- Role: Act as a Senior Systems Architect and Technical Educator.
-- Objective: Teach concepts deeply. Explain not just WHAT something is, but WHY it works, HOW the hardware/software handles it under the hood, and how it impacts this specific lab environment.
-- Tone: Conversational, engaging, and clear. Avoid robotic brevity.
-- Pedagogical approach:
-  - Lead with the core concept using an intuitive summary.
-  - Break down the underlying mechanics.
-  - Summarize key takeaways or trade-offs where possible.
+# Homelab
 
-# Operational Guidelines
+Single-node Proxmox VE 9 lab: node `pve`, SSH alias `proxmox-lab` (root, key auth), `192.168.1.200`.
+Workflow from this machine: Packer builds template 9000 → OpenTofu clones VMs (not set up yet) → Ansible configures them (not set up yet). `just --list` shows entry points.
 
-- Workload restriction:
-    - Target: KVM/QEMU virtual machines (`qm`) only.
-    - NEVER generate, deploy, or run LXC container commands (`pct`).
-- Hardware envelope:
-    - Host limits defined in `docs/HARDWARE.md`.
-    - Memory ceiling: 16GB total (max ~13.5GB allocated across all VMs).
-    - CPU ceiling: 4 vCPUs maximum per VM.
-    - Storage pool: thin LVM (`local-lvm`) for virtual disks.
-- Network envelope:
-    - Static IPs must fall within `192.168.1.201–192.168.1.254` (`docs/NETWORK_CONFIGURATION.md`).
-    - Gateway: `192.168.1.1`.
-    - Hypervisor bridge: `vmbr0`.
-- State maintenance:
-    - Repository docs are live state files.
-    - Update `docs/` files whenever allocating IPs, altering templates, or modifying node state.
-    - ALWAYS notify the user whenever a documentation file is edited.
-- Surgical changes & minimal diffs:
-    - Touch only files and hypervisor parameters required for the task.
-    - Keep diffs minimal and focused strictly on the requested objective.
-    - Never refactor working Proxmox scripts, bridges, or template configs casually.
-    - Match existing bash style (`set -euo pipefail`, explicit argument parsing, `qm` CLI).
-    - Clean up temporary artifacts, ISO downloads, or dangling VMs created during execution.
-- Goal-driven verification:
-    - Verify host reachability: run `just check`.
-    - Verify VM operations: check state using `ssh proxmox-lab qm status <VMID>`.
-    - Verify network assignments: probe target IP via `ping` or `nc` before and after allocation.
+## Reference docs (live state; read before acting)
+- `docs/HARDWARE.md`: host specs, CPU/RAM budgets, storage pools, VMID reservations.
+- `docs/NETWORK_CONFIGURATION.md`: bridges, DNS, IP plan, static IP ledger, API access.
 
-## Diagram Triggers
+## Rules
+- VMs only (`qm`). Never use LXC (`pct`).
+- Stay within budget: ≤4 vCPUs per VM, ≤13.5GB RAM across all VMs, disks on `local-lvm`.
+- Static IPs come from `192.168.1.201–254` on `vmbr0`, gateway `192.168.1.1`. Check the ledger, then `ping` the IP to confirm it's free before allocating.
+- Update `docs/` when you allocate an IP or VMID, change a template, or change host config. Tell the user which doc you edited.
+- API credentials are in `.env` (gitignored). Load with `source .env`; never print or commit values.
+- Bash style: `set -euo pipefail`, explicit argument parsing, `qm` CLI. Don't refactor working scripts, bridges, or templates unless asked.
+- Remove anything temporary you create (ISOs, test VMs, files).
 
-- IF task requires architecture, network, or workflow diagrams:
-    - Follow specifications in `docs/DIAGRAMS.md`.
-    - Save sources to `docs/diagrams/<name>.d2`.
-
-## Formatting Guidelines
-- Default to well-structured, readable paragraphs rather than fragmented bullet lists.
-- Use bullet points only when listing concrete steps, configurations, or parameter sets.
-- Code blocks, commands, and config files should always be preceded by an explanation of what each parameter does.
+## Verify
+- Host: `just check`
+- VM: `ssh proxmox-lab qm status <VMID>`
+- IP: `ping` or `nc` the address before and after allocation.
