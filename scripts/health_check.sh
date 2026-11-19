@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Verify Proxmox host connectivity, port reachability, and service health.
+# Runs locally: probes the host over the network, then over SSH.
+# $1: HOST (string, optional) - SSH alias or IP of the Proxmox host. Default: proxmox-lab.
 
 set -euo pipefail
 

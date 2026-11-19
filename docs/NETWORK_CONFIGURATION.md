@@ -3,6 +3,8 @@
 - Internet Uplink: ISP uses Carrier-Grade NAT (CGNAT)
     - Inbound forwarding: None
     - Implication: No public IPv4; all services are local LAN only
+- Router: No DHCP reservations available
+    - Implication: Fixed addresses must be set statically on the machine itself (cloud-init `ipconfig0` for VMs), never via the router
 - Domain & DNS Settings:
     - Search domain: `duane`
     - Primary nameserver: `1.1.1.1` (Cloudflare public resolver)
@@ -20,7 +22,7 @@
         - Web console: `https://192.168.1.200:8006`
         - SSH management: `ssh proxmox-lab` (root, key `~/.ssh/id_ed25519_proxmox_lab`)
         - API access (Packer/OpenTofu): token `automation@pve!homelab` (PVEAdmin on `/`), credentials in repo-root `.env`
-    - `192.168.1.201`–`192.168.1.254`: Static IP reservation pool for VMs
+    - `192.168.1.201`–`192.168.1.254`: Static IP pool for VMs (outside the DHCP range; set on each VM)
 
 ## Static IP Allocation Ledger
 

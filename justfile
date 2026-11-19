@@ -10,9 +10,9 @@ default:
 check target=host:
     ./scripts/health_check.sh {{target}}
 
-# List VMs on the Proxmox host
-list:
-    ssh {{host}} qm list
+# List VMs, LXCs, and templates on the Proxmox host (format: table | json)
+inventory format="table":
+    ./scripts/inventory.sh {{host}} {{format}}
 
 # Upgrade Proxmox host packages (reboot: auto | yes | no)
 upgrade reboot="auto":

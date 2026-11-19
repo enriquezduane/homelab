@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Run safe maintenance upgrades on the Proxmox host.
+# Runs on the host: `just upgrade` pipes it over SSH (`bash -s`).
 # $1: REBOOT (string, optional) - Reboot policy: auto, yes, no. Default: auto.
 
 set -euo pipefail
