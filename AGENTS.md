@@ -1,7 +1,7 @@
 # Homelab
 
 Single-node Proxmox VE 9 lab: node `pve`, SSH alias `proxmox-lab` (root, key auth), `192.168.1.200`.
-Workflow from this machine: Packer builds template 9000 → OpenTofu clones VMs (not set up yet) → Ansible configures them (not set up yet). `just --list` shows entry points.
+Workflow from this machine: Packer builds template 9000 → OpenTofu clones VMs (`tofu/`; VMs in `terraform.tfvars`, cloud-init in `tofu/cloud-init/`) → Ansible configures them (not set up yet). `just --list` shows entry points.
 
 ## Reference docs (live state; read before acting)
 - `docs/HARDWARE.md`: host specs, CPU/RAM budgets, storage pools, VMID reservations.
@@ -14,7 +14,7 @@ Workflow from this machine: Packer builds template 9000 → OpenTofu clones VMs 
 - The router has no DHCP reservations: set fixed IPs on the VM (cloud-init `ipconfig0`), never rely on DHCP.
 - ISP uses CGNAT: no public IPv4 and no port forwarding. Everything is LAN-only; remote access needs an outbound tunnel/VPN.
 - Update `docs/` when you allocate an IP or VMID, change a template, or change host config. Tell the user which doc you edited.
-- API credentials are in `.env` (gitignored). Load with `source .env`; never print or commit values.
+- API credentials are in `.env` (gitignored). Loaded automatically by direnv (`.envrc`) and `just` (`dotenv-load`); never print or commit values.
 - New tooling goes in `scripts/<name>.sh` with a one-line `just` recipe. Header states purpose, args, and whether it runs locally or on the host.
 - Bash style: `set -euo pipefail`, explicit argument parsing, `qm` CLI. Don't refactor working scripts, bridges, or templates unless asked.
 - Remove anything temporary you create (ISOs, test VMs, files).

@@ -1,5 +1,8 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+# Load API credentials from .env for every recipe (no manual `source`)
+set dotenv-load
+
 host := "proxmox-lab"
 
 # List available recipes
@@ -18,18 +21,30 @@ inventory format="table":
 upgrade reboot="auto":
     ssh {{host}} 'bash -s' -- "{{reboot}}" < scripts/upgrade.sh
 
-# Build Debian 13 template (VMID 9000) with Packer, using API creds from .env
+# Build Debian 13 template (VMID 9000) with Packer
 packer-build:
-    source .env && cd packer && packer init . && packer build .
+    cd packer && packer init . && packer build .
 
-# Preview VM changes with OpenTofu (Milestone 2)
-tofu-plan: (_todo "OpenTofu" "2")
+# Download OpenTofu providers (run once, or after changing versions)
+tofu-init:
+    tofu -chdir=tofu init
 
-# Create/update VMs with OpenTofu (Milestone 2)
-tofu-apply: (_todo "OpenTofu" "2")
+# Preview VM changes with OpenTofu
+tofu-plan:
+    tofu -chdir=tofu plan
 
-# Configure and harden VMs with Ansible (Milestone 4)
-ansible: (_todo "Ansible" "4")
+# Create/update VMs with OpenTofu
+tofu-apply:
+    tofu -chdir=tofu apply
 
-_todo tool milestone:
-    @echo "Not set up yet: {{tool}} arrives in Milestone {{milestone}}." >&2; exit 1
+# Forget a rebuilt VM's old SSH host key (e.g. just forget-host 192.168.1.201 debian-01)
+forget-host ip name="":
+    ./scripts/forget_host.sh {{quote(ip)}} {{quote(name)}}
+
+# Check Ansible can reach every VM and sudo to root
+ansible-ping:
+    cd ansible && ansible-playbook playbooks/ping.yml
+
+# Configure VMs with Ansible (extra args pass through, e.g. just ansible-run --check --limit debian-01)
+ansible-run *args:
+    cd ansible && ansible-playbook playbooks/site.yml {{args}}

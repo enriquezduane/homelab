@@ -18,14 +18,18 @@
     - Root filesystem: `local`
         - Type: Directory (`/var/lib/vz`)
         - Size: ~98.5 GB (~83 GB available)
-        - Content: ISO images, container templates, backup archives
+        - Content: ISO images, container templates, backup archives, disk imports, snippets
+        - Snippets: cloud-init user-data uploaded by OpenTofu (`/var/lib/vz/snippets/<hostname>-user-data.yaml`)
     - VM disk storage: `local-lvm`
         - Type: LVM-thin (`data` thinpool in `pve` volume group)
         - Size: ~364.8 GB (~362 GB available)
         - Content: Virtual machine raw block images (`rootdir,images`)
         - Virtual disk policy: 20GB thin-provisioned root disk standard per VM
 - VM Templates (VMID reservations):
-    - `9000`: Debian 13 golden template (`just packer-build`, `packer/debian-13.pkr.hcl`)
+    - `9000`: Debian 13 golden template (`just packer-build`, `packer/debian-13.pkr.hcl`). 20GB disk, single ext4 root partition, no swap; clones grow root to their `disk_gb` on first boot. To rebuild: `qm destroy 9000 --purge` first (existing full clones are unaffected)
+- VMs (OpenTofu, `tofu/terraform.tfvars`):
+    - `201`: `debian-01`, 2 vCPU / 2GB RAM / 20GB disk, `192.168.1.201`
+    - Allocated: 2 of 4 vCPUs, 2GB of 13.5GB guest RAM
 - Networking: 2x Gigabit Ethernet (1GbE RJ45) + Wi-Fi
     - `enp1s0`: Primary NIC, bound to Linux bridge `vmbr0`, 1000 Mbps full-duplex
     - `enp2s0`: Second 1GbE NIC, not connected / unused

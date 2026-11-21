@@ -23,12 +23,13 @@
         - SSH management: `ssh proxmox-lab` (root, key `~/.ssh/id_ed25519_proxmox_lab`)
         - API access (Packer/OpenTofu): token `automation@pve!homelab` (PVEAdmin on `/`), credentials in repo-root `.env`
     - `192.168.1.201`–`192.168.1.254`: Static IP pool for VMs (outside the DHCP range; set on each VM)
+        - SSH from the workstation: `ssh duane@<ip>` (no LAN DNS; `tofu -chdir=tofu output vms` lists each VM's SSH command). A rebuilt VM gets new host keys: run `ssh-keygen -R <ip>` first
 
 ## Static IP Allocation Ledger
 
 | IP Address | VMID | Hostname | Distro | Notes / Role |
 | :--- | :--- | :--- | :--- | :--- |
 | `192.168.1.200` | Host | `pve` (alias `proxmox-lab`) | Debian 13 / PVE 9 | Hypervisor node |
-| `192.168.1.201` | | | | |
+| `192.168.1.201` | `201` | `debian-01` | Debian 13 | General-purpose VM; OpenTofu-managed (`tofu/terraform.tfvars`) |
 | `192.168.1.202` | | | | |
 | `192.168.1.203` | | | | |

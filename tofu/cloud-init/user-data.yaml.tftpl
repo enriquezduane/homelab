@@ -1,0 +1,29 @@
+#cloud-config
+# Cloud-init user-data for every VM. OpenTofu renders this per VM (vms.tf) and
+# uploads it as a Proxmox snippet: local:snippets/<hostname>-user-data.yaml.
+#
+# It REPLACES the user-data Proxmox would generate, so hostname, user and keys
+# must be set here. Network (IP, gateway, DNS) is NOT here: Proxmox still
+# generates network-config from the VM's ipconfig0/nameserver settings.
+#
+# Template variables: hostname, fqdn, username, ssh_public_keys.
+# Cloud-init only applies this on first boot; changes later need a rebuild.
+
+hostname: ${hostname}
+fqdn: ${fqdn}
+manage_etc_hosts: true
+
+users:
+  - name: ${username}
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+%{ for key in ssh_public_keys ~}
+      - ${jsonencode(key)}
+%{ endfor ~}
+
+# Key-only SSH, no root login.
+ssh_pwauth: false
+disable_root: true
