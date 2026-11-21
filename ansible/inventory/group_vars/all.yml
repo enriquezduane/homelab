@@ -1,0 +1,5 @@
+# Applies to every host. Per-group overrides: group_vars/<group>.yml;
+# per-host overrides: host_vars/<hostname>.yml
+ansible_user: duane
+# Pinned so discovery never runs (no warning, same interpreter everywhere)
+ansible_python_interpreter: /usr/bin/python3

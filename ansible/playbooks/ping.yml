@@ -1,0 +1,15 @@
+---
+# Connectivity + sudo check: SSH works and passwordless sudo reaches root.
+- name: Check connectivity and privilege escalation
+  hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:
+
+    - name: Confirm we are root after become
+      ansible.builtin.command: whoami
+      register: whoami
+      changed_when: false
+      failed_when: whoami.stdout != 'root'

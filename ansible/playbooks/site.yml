@@ -1,0 +1,7 @@
+---
+# Main entry point: `just ansible-run`. Add roles here as you build them.
+- name: Configure lab VMs
+  hosts: all
+  become: true
+  roles:
+    - common

@@ -1,0 +1,50 @@
+---
+# Baseline for every VM. Extend with hardening, users, etc.
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: dist
+    autoremove: true
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - vim
+      - htop
+      - qemu-guest-agent
+    state: present
+
+- name: Ensure qemu-guest-agent is running
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    state: started
+
+- name: Disable root SSH login
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-no-root.conf
+    content: |
+      PermitRootLogin no
+    owner: root
+    group: root
+    mode: "0644"
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Restart ssh
+
+# Debian has no reboot-required flag file, so compare the running kernel
+# (ansible_facts.kernel, gathered before the upgrade) with the newest installed.
+- name: Find newest installed kernel
+  ansible.builtin.shell: set -o pipefail; ls -1v /boot/vmlinuz-* | tail -n1 | sed 's|/boot/vmlinuz-||'
+  args:
+    executable: /bin/bash
+  register: newest_kernel
+  changed_when: false
+
+- name: Reboot if a newer kernel is installed
+  ansible.builtin.reboot:
+    reboot_timeout: 600
+  when: newest_kernel.stdout != ansible_facts.kernel
