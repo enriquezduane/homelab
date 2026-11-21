@@ -18,18 +18,13 @@ packer {
 }
 
 ### 2. Proxmox API Connection
-# Read from environment variables exported by the repo-root .env.
-# Packer does NOT read .env files itself; `just packer-build` loads it for you.
-# Builds fail fast with a clear message if any of these are empty.
+# The endpoint is not a secret, so it is explicit here. The token ID and secret
+# come from the environment (repo-root .env, loaded by direnv or `just`).
+# Packer does NOT read .env itself. Builds fail fast if a credential is empty.
 variable "proxmox_url" {
   type        = string
-  default     = env("PROXMOX_URL")
-  description = "Proxmox API endpoint, e.g. https://192.168.1.200:8006/api2/json"
-
-  validation {
-    condition     = length(var.proxmox_url) > 0
-    error_message = "PROXMOX_URL is not set. Add it to the repo-root .env."
-  }
+  default     = "https://192.168.1.200:8006/api2/json"
+  description = "Proxmox API endpoint"
 }
 
 variable "proxmox_username" {
